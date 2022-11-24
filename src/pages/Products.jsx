@@ -18,8 +18,15 @@ import { useSelector } from "react-redux";
 import { arrowStyle, btnHoverStyle, flexCenter } from "../styles/globalStyle";
 import useSortColumn from "../hooks/useSortColumn";
 import { MultiSelectBox, MultiSelectBoxItem } from "@tremor/react";
+
 const Products = () => {
-  const { getBrands, getCategories, getProducts } = useStockCalls();
+  const {
+    getBrands,
+    getCategories,
+    getProducts,
+    deleteProduct,
+    getProCatBrands,
+  } = useStockCalls();
   const { products, brands } = useSelector((state) => state.stock);
   const [open, setOpen] = useState(false);
   const [info, setInfo] = useState({});
@@ -27,9 +34,10 @@ const Products = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
 
   useEffect(() => {
-    getBrands();
-    getCategories();
-    getProducts();
+    // getBrands();
+    // getCategories();
+    // getProducts();
+    getProCatBrands();
   }, []);
 
   const columnObj = {
@@ -49,6 +57,9 @@ const Products = () => {
   //? durumunda filter bir suzme yapmamis olur.
   const isBrandSelected = (item) =>
     selectedBrands.includes(item.brand) || selectedBrands.length === 0;
+
+  const isProductSelected = (item) =>
+    selectedProducts.includes(item.name) || selectedProducts.length === 0;
 
   //? products dizisinden secilmis brand'larin product name'lerini bir diziye saklar
   const filtredProducts = products
@@ -171,6 +182,7 @@ const Products = () => {
             <TableBody>
               {sortedData
                 ?.filter((item) => isBrandSelected(item))
+                .filter((item) => isProductSelected(item))
                 .map((product, index) => (
                   <TableRow
                     key={product.name}
@@ -183,7 +195,10 @@ const Products = () => {
                     <TableCell align="center">{product.brand}</TableCell>
                     <TableCell align="center">{product.name}</TableCell>
                     <TableCell align="center">{product.stock}</TableCell>
-                    <TableCell align="center">
+                    <TableCell
+                      align="center"
+                      onClick={() => deleteProduct(product.id)}
+                    >
                       <DeleteIcon sx={btnHoverStyle} />
                     </TableCell>
                   </TableRow>
